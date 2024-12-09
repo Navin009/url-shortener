@@ -3,25 +3,42 @@ use crate::utils::shortener::generate_short_code;
 use actix_web::{get, post, web, HttpResponse};
 use mongodb::bson::{doc, oid::ObjectId};
 use mongodb::Collection;
+use serde_json::json;
 
-#[post("/shorten")]
+#[post("/create")]
 pub async fn create_short_url(
     db: web::Data<mongodb::Database>,
     payload: web::Json<NewUrl>,
 ) -> HttpResponse {
+    log::info!("Received payload: {:#?}", payload.url);
+
     let collection: Collection<Url> = db.collection("urls");
     let short_code = generate_short_code();
     let new_url = Url {
         id: ObjectId::new(),
-        long_url: payload.long_url.clone(),
+        long_url: payload.url.clone(),
         short_code: short_code.clone(),
         redirect_count: 0,
     };
 
-    match collection.insert_one(new_url).await {
-        Ok(_) => HttpResponse::Ok().json(short_code),
-        Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
-    }
+    let short_code = match collection.insert_one(new_url).await {
+        Ok(_) => {
+            println!("Short code created successfully.");
+            short_code
+        }
+
+        Err(err) => {
+            return HttpResponse::InternalServerError().json(json!({
+                "status": "error",
+                "message": err.to_string()
+            }));
+        }
+    };
+
+    HttpResponse::Ok().json(json!({
+        "status": "success",
+        "short_code": short_code
+    }))
 }
 
 #[get("/{short_code}")]
@@ -39,7 +56,7 @@ pub async fn redirect(
         )
         .await
     {
-        Ok(Some(url)) => HttpResponse::TemporaryRedirect()
+        Ok(Some(url)) => HttpResponse::PermanentRedirect()
             .append_header(("Location", url.long_url))
             .finish(),
         Ok(None) => HttpResponse::NotFound().json("Short URL not found"),

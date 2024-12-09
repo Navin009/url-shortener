@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Url {
+    #[serde(rename = "_id", skip_serializing)]
     pub id: ObjectId,
     pub long_url: String,
     pub short_code: String,
@@ -11,5 +12,5 @@ pub struct Url {
 
 #[derive(Deserialize)]
 pub struct NewUrl {
-    pub long_url: String,
+    pub url: String,
 }

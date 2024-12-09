@@ -1,9 +1,10 @@
 mod config;
 mod handlers;
+mod middleware;
 mod models;
 mod utils;
 
-use actix_web::{middleware::Logger, web::Data, App, HttpServer};
+use actix_web::{http::StatusCode, middleware::{ErrorHandlers, Logger}, web::Data, App, HttpServer};
 use config::init_db;
 
 #[actix_web::main]
@@ -15,6 +16,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(db.clone())) // Pass database to app
             .wrap(Logger::default()) // Enable logging middleware
+            .wrap(ErrorHandlers::new().handler(StatusCode::BAD_REQUEST, middleware::validation_handler::add_error_body))
             .configure(handlers::init_routes) // Initialize routes
     })
     .bind("127.0.0.1:8080")?

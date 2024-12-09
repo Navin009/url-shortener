@@ -1,7 +1,7 @@
 use crate::models::url::{NewUrl, Url};
 use crate::utils::shortener::generate_short_code;
 use actix_web::{get, post, web, HttpResponse};
-use mongodb::bson::{doc, oid::ObjectId};
+use mongodb::bson::doc;
 use mongodb::Collection;
 use serde_json::json;
 
@@ -15,7 +15,6 @@ pub async fn create_short_url(
     let collection: Collection<Url> = db.collection("urls");
     let short_code = generate_short_code();
     let new_url = Url {
-        id: ObjectId::new(),
         long_url: payload.url.clone(),
         short_code: short_code.clone(),
         redirect_count: 0,

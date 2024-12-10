@@ -54,13 +54,13 @@ To build and run the project, ensure you have the following installed:
 
 ### Endpoints
 
-| Method | Endpoint                 | Description                   |
-| ------ | ------------------------ | ----------------------------- |
-| `POST` | `/create`                | Shorten a given URL.          |
-| `GET`  | `/{short_code}`          | Redirect to the original URL. |
-| `GET`  | `/health`                | Check server health.          |
-| `GET`  | `/ping`                  | Check server status.          |
-| `GET`  | `/details/{short_code}`  | Get URL details.              |
+| Method | Endpoint                | Description                   |
+| ------ | ----------------------- | ----------------------------- |
+| `POST` | `/create`               | Shorten a given URL.          |
+| `GET`  | `/{short_code}`         | Redirect to the original URL. |
+| `GET`  | `/health`               | Check server health.          |
+| `GET`  | `/ping`                 | Check server status.          |
+| `GET`  | `/details/{short_code}` | Get URL details.              |
 
 #### Example: Shortening a URL
 
@@ -78,9 +78,13 @@ To build and run the project, ensure you have the following installed:
 
 ```json
 {
-	"short_url": "http://localhost:8080/short_code"
+	"status": "success",
+	"short_code": "iE7jHm6",
+	"short_url": "http://localhost:8080/iE7jHm6"
 }
 ```
+
+---
 
 #### Example: Redirecting
 
@@ -133,7 +137,6 @@ rust-url-shortener/
 - [rand](https://docs.rs/rand): Random number generation
 - [tokio](https://docs.rs/tokio): Async runtime
 - [serde_json](https://docs.rs/serde_json): JSON serialization/deserialization
-
 
 ---
 

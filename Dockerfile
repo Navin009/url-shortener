@@ -15,13 +15,13 @@ RUN mkdir src && echo "fn main() {}" > src/main.rs
 
 RUN cargo fetch --locked
 
-RUN rm -rf src
+RUN cargo build --release && rm -rf src
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN cargo build --release
+RUN cargo build -r
 
 # Stage 2: Runtime
 FROM ubuntu:noble

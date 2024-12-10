@@ -8,6 +8,7 @@ pub struct Url {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct NewUrl {
     pub domain: String,
     pub url: String,

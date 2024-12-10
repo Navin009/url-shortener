@@ -40,7 +40,6 @@ To build and run the project, ensure you have the following installed:
 
    ```bash
    MONGO_URI=mongodb://localhost:27017
-   MONGO_DB=shortener
    ```
 
 4. Run the application:
@@ -70,7 +69,7 @@ To build and run the project, ensure you have the following installed:
 ```json
 {
 	"url": "https://example.com",
-	"domain": "p"
+	"expriy": "2023-12-31T23:59:59Z"
 }
 ```
 

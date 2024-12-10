@@ -10,16 +10,30 @@ use actix_web::{
     web::Data,
     App, HttpServer,
 };
-use config::init_db;
+use config::{init_app_config, init_db, AppData};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    let config = init_app_config()
+        .await
+        .expect("Failed to initialize config");
 
-    let db = init_db().await.expect("Failed to initialize database");
+    let log_level = config["logging"]["level"].as_str().unwrap();
+
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or(log_level));
+
+    let db = init_db(&config)
+        .await
+        .expect("Failed to initialize database");
+
+    let app_data = AppData {
+        db: db.clone(),
+        config: config.clone(),
+    };
+
     HttpServer::new(move || {
         App::new()
-            .app_data(Data::new(db.clone())) // Pass database to app
+            .app_data(Data::new(app_data.clone())) // Pass database to app
             .wrap(Logger::default()) // Enable logging middleware
             .wrap(ErrorHandlers::new().handler(
                 StatusCode::BAD_REQUEST,

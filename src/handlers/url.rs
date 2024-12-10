@@ -1,23 +1,23 @@
+use crate::config::AppData;
 use crate::models::url::{NewUrl, Url};
 use crate::utils::shortener::generate_short_code;
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{get, web, HttpResponse};
 use mongodb::bson::doc;
 use mongodb::Collection;
 use serde_json::json;
 
-#[post("/create")]
 pub async fn create_short_url(
-    db: web::Data<mongodb::Database>,
+    state: web::Data<AppData>,
     payload: web::Json<NewUrl>,
 ) -> HttpResponse {
-    log::info!("Received payload: {:#?}", payload.url);
-
-    let collection: Collection<Url> = db.collection("urls");
+    let collection: Collection<Url> = state.db.collection("urls");
     let short_code = generate_short_code();
     let new_url = Url {
         long_url: payload.url.clone(),
         short_code: short_code.clone(),
         redirect_count: 0,
+        created_at: chrono::Utc::now().naive_utc(),
+        expiry_date: payload.expiry,
     };
 
     let short_code = match collection.insert_one(new_url).await {
@@ -41,11 +41,11 @@ pub async fn create_short_url(
 }
 
 #[get("/{short_code}")]
-pub async fn redirect(
-    db: web::Data<mongodb::Database>,
+pub async fn referral_redirect(
+    state: web::Data<AppData>,
     short_code: web::Path<String>,
 ) -> HttpResponse {
-    let collection: Collection<Url> = db.collection("urls");
+    let collection: Collection<Url> = state.db.collection("urls");
     let short_code = short_code.into_inner();
 
     match collection
@@ -65,10 +65,10 @@ pub async fn redirect(
 
 #[get("/details/{short_code}")]
 pub async fn get_url_details(
-    db: web::Data<mongodb::Database>,
+    state: web::Data<AppData>,
     short_code: web::Path<String>,
 ) -> HttpResponse {
-    let collection: Collection<Url> = db.collection("urls");
+    let collection: Collection<Url> = state.db.collection("urls");
     let short_code = short_code.into_inner();
 
     match collection

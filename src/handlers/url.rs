@@ -55,9 +55,20 @@ pub async fn referral_redirect(
         )
         .await
     {
-        Ok(Some(url)) => HttpResponse::PermanentRedirect()
-            .append_header(("Location", url.long_url))
-            .finish(),
+        Ok(Some(url)) => match url.expiry_date {
+            Some(expiry_date) => {
+                if expiry_date < chrono::Utc::now().naive_utc() {
+                    HttpResponse::Gone().finish()
+                } else {
+                    HttpResponse::PermanentRedirect()
+                        .append_header(("Location", url.long_url))
+                        .finish()
+                }
+            }
+            None => HttpResponse::PermanentRedirect()
+                .append_header(("Location", url.long_url))
+                .finish(),
+        },
         Ok(None) => HttpResponse::NotFound().json("Short URL not found"),
         Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
     }

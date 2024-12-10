@@ -53,12 +53,12 @@ pub async fn basic_auth_middleware(
 
         Ok(ServiceResponse::new(
             req.request().clone(),
-            HttpResponse::Unauthorized().json("Unauthorized"),
+            HttpResponse::Unauthorized().finish(),
         ))
     } else {
         Ok(ServiceResponse::new(
             req.request().clone(),
-            HttpResponse::Unauthorized().json("Unauthorized"),
+            HttpResponse::Unauthorized().finish(),
         ))
     }
 }

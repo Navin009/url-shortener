@@ -1,10 +1,11 @@
 use base64::prelude::*;
-use std::sync::Arc;
+use serde_json::json;
 
 use actix_web::{
     body::{BoxBody, MessageBody},
     dev::{ServiceRequest, ServiceResponse},
     middleware::Next,
+    web::{self},
     Error, HttpResponse,
 };
 
@@ -15,12 +16,15 @@ pub async fn basic_auth_middleware(
     next: Next<BoxBody>,
 ) -> Result<ServiceResponse<impl MessageBody>, Error> {
     // pre-processing
-    let config = match req.app_data::<Arc<AppData>>() {
+    let config = match req.app_data::<web::Data<AppData>>() {
         Some(data) => &data.config,
         None => {
             return Ok(ServiceResponse::new(
                 req.request().clone(),
-                HttpResponse::InternalServerError().json("AppData not found"),
+                HttpResponse::InternalServerError().json(json!({
+                    "status": "error",
+                    "message": "Failed to get config"
+                })),
             ));
         }
     };
@@ -44,16 +48,17 @@ pub async fn basic_auth_middleware(
 
             if decoded_username == username && decoded_password == password {
                 return next.call(req).await;
-            } else {
-                return Ok(ServiceResponse::new(
-                    req.request().clone(),
-                    HttpResponse::Unauthorized().json("Unauthorized"),
-                ));
             }
         }
+
+        Ok(ServiceResponse::new(
+            req.request().clone(),
+            HttpResponse::Unauthorized().json("Unauthorized"),
+        ))
+    } else {
+        Ok(ServiceResponse::new(
+            req.request().clone(),
+            HttpResponse::Unauthorized().json("Unauthorized"),
+        ))
     }
-
-    let res = next.call(req).await?;
-
-    Ok(res)
 }

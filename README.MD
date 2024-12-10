@@ -26,7 +26,7 @@ To build and run the project, ensure you have the following installed:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/rust-url-shortener.git
+   git clone https://github.com/Navin009/url-shortener.git
    cd rust-url-shortener
    ```
 
@@ -54,21 +54,23 @@ To build and run the project, ensure you have the following installed:
 
 ### Endpoints
 
-| Method | Endpoint       | Description                   |
-| ------ | -------------- | ----------------------------- |
-| `POST` | `/shorten`     | Shorten a given URL.          |
-| `GET`  | `/{alias}`     | Redirect to the original URL. |
-| `GET`  | `/healthcheck` | Check server health.          |
+| Method | Endpoint                 | Description                   |
+| ------ | ------------------------ | ----------------------------- |
+| `POST` | `/create`                | Shorten a given URL.          |
+| `GET`  | `/{short_code}`          | Redirect to the original URL. |
+| `GET`  | `/health`                | Check server health.          |
+| `GET`  | `/ping`                  | Check server status.          |
+| `GET`  | `/details/{short_code}`  | Get URL details.              |
 
 #### Example: Shortening a URL
 
 **Request**  
-`POST /shorten`
+`POST /create`
 
 ```json
 {
 	"url": "https://example.com",
-	"alias": "example" // Optional
+	"domain": "p"
 }
 ```
 
@@ -76,7 +78,7 @@ To build and run the project, ensure you have the following installed:
 
 ```json
 {
-	"short_url": "http://localhost:8080/example"
+	"short_url": "http://localhost:8080/short_code"
 }
 ```
 
@@ -101,6 +103,20 @@ rust-url-shortener/
 └── README.md            # Documentation
 ```
 
+```
+rust-url-shortener/
+├── src/
+│   ├── main.rs          # Entry point
+│   ├── config.rs        # Database configuration
+|   ├── handlers         # API route handlers
+│   ├── middleware       # Middleware functions
+│   ├── models           # Data models for URL and database
+│   ├── utils            # Utility functions
+├── .env                 # Environment variables
+├── Cargo.toml           # Project dependencies and metadata
+└── README.md            # Documentation
+```
+
 ---
 
 ## Dependencies
@@ -109,6 +125,15 @@ rust-url-shortener/
 - [MongoDB](https://docs.rs/mongodb): MongoDB driver
 - [Serde](https://serde.rs/): JSON serialization/deserialization
 - [dotenv](https://docs.rs/dotenv): Environment variable management
+- [validator](https://docs.rs/validator): Data validation
+- [Rust](https://www.rust-lang.org/): Programming language
+- [chrono](https://docs.rs/chrono): Date and time handling
+- [log](https://docs.rs/log): Logging
+- [env_logger](https://docs.rs/env_logger): Logging backend
+- [rand](https://docs.rs/rand): Random number generation
+- [tokio](https://docs.rs/tokio): Async runtime
+- [serde_json](https://docs.rs/serde_json): JSON serialization/deserialization
+
 
 ---
 
@@ -149,9 +174,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For questions or suggestions, reach out to:
 
-- **Author**: Your Name
-- **Email**: your.email@example.com
-- **GitHub**: [yourusername](https://github.com/yourusername)
+- **Author**: Navin Kumar
+- **Email**: mailbox.navinkumar@example.com
+- **GitHub**: [navin009](https://github.com/Navin009)
 
 ---
 
